@@ -167,6 +167,27 @@ def task_instance_info(dag_id, execution_date, task_id):
     return jsonify(fields)
 
 
+@api_experimental.route('/dags', methods=['GET'])
+@api_experimental.route('/dags/owner/<string:owner>', methods=['GET'])
+@requires_authentication
+def dags(owner=None):
+    """Returns the latest DagRun for each DAG formatted for the UI. """
+    from airflow.models import DagModel
+    dags = DagModel.get_all_root(owner=owner)
+    payload = []
+    for dag in dags:
+        payload.append({
+            'dag_id': dag.dag_id,
+            'last_scheduler_run': dag.last_scheduler_run.isoformat(),
+            'owner': dag.owners,
+            'is_active': dag.is_active,
+            'is_paused': dag.is_paused,
+            # 'dag_run_url': url_for('airflow.graph', dag_id=dagrun.dag_id,
+            #                        execution_date=dagrun.execution_date)
+        })
+    return jsonify(items=payload)  # old flask versions dont support jsonifying arrays
+
+
 @api_experimental.route('/latest_runs', methods=['GET'])
 @requires_authentication
 def latest_dag_runs():

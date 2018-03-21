@@ -2922,6 +2922,13 @@ class DagModel(Base):
     def get_current(cls, dag_id, session=None):
         return session.query(cls).filter(cls.dag_id == dag_id).first()
 
+    @classmethod
+    @provide_session
+    def get_all_root(cls, owner=None, session=None):
+        query = session.query(cls)
+        if owner:
+            return query.filter(cls.is_subdag == False, cls.owners == owner).all()
+        return query.filter(cls.is_subdag == False).all()
 
 @functools.total_ordering
 class DAG(BaseDag, LoggingMixin):
