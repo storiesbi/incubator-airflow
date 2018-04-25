@@ -3695,7 +3695,12 @@ class DAG(BaseDag, LoggingMixin):
         memo[id(self)] = result
         for k, v in list(self.__dict__.items()):
             if k not in ('user_defined_macros', 'user_defined_filters', 'params'):
-                setattr(result, k, copy.deepcopy(v, memo))
+                # hotfix on
+                # TypeError: __init__() takes 1 positional argument but 6 were given
+                try:
+                    setattr(result, k, copy.deepcopy(v, memo))
+                except TypeError as e:
+                    self.log.debug(e)
 
         result.user_defined_macros = self.user_defined_macros
         result.user_defined_filters = self.user_defined_filters

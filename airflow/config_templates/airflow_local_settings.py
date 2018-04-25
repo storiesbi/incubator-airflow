@@ -35,7 +35,10 @@ PROCESSOR_FILENAME_TEMPLATE = '{{ filename }}.log'
 # Storage bucket url for remote logging
 # s3 buckets should start with "s3://"
 # gcs buckets should start with "gs://"
-REMOTE_BASE_LOG_FOLDER = ''
+try:
+    REMOTE_BASE_LOG_FOLDER = conf.get('core', 'REMOTE_BASE_LOG_FOLDER')
+except:
+    REMOTE_BASE_LOG_FOLDER = ''
 
 DEFAULT_LOGGING_CONFIG = {
     'version': 1,
